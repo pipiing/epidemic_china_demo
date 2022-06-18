@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chen.boot.mapper.GlobalDataBeanMapper">
+
+    <resultMap id="BaseResultMap" type="com.chen.boot.entity.GlobalDataBean">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="confirm" column="confirm" jdbcType="INTEGER"/>
+            <result property="confirmAdd" column="confirm_add" jdbcType="INTEGER"/>
+            <result property="nowConfirm" column="now_confirm" jdbcType="INTEGER"/>
+            <result property="nowConfirmCompare" column="now_confirm_compare" jdbcType="INTEGER"/>
+            <result property="dead" column="dead" jdbcType="INTEGER"/>
+            <result property="deadCompare" column="dead_compare" jdbcType="INTEGER"/>
+            <result property="heal" column="heal" jdbcType="INTEGER"/>
+            <result property="healCompare" column="heal_compare" jdbcType="INTEGER"/>
+            <result property="continent" column="continent" jdbcType="VARCHAR"/>
+            <result property="date" column="date" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,confirm,
+        confirm_add,now_confirm,now_confirm_compare,
+        dead,dead_compare,heal,
+        heal_compare,continent,date
+    </sql>
+</mapper>

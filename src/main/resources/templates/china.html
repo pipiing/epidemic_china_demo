@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>中国现有确诊新冠病毒疫情地图</title>
+        <div th:include="common :: common-link"></div>
+    </head>
+    <body>
+        <div class="layui-layout layui-layout-admin">
+
+            <div th:include="common :: common-head"></div>
+
+            <div th:include="common :: common-nav"></div>
+
+
+            <div class="layui-body">
+                <fieldset class="layui-elem-field layui-field-title" style="margin: 10px;">
+                    <legend>新冠肺炎实时疫情数据展示 --- 统计截止时间：<span th:text="${chinaData.date}"></span></legend>
+                </fieldset>
+
+                <div class="layui-btn-container">
+                    <button class="layui-btn layui-btn-primary layui-btn-lg layui-btn-radius">中国疫情数据</button>
+                    <button class="layui-btn layui-btn-lg layui-bg-red layui-btn-radius" th:text="'现有确诊人数：'+${chinaData.nowConfirm}"></button>
+                    <button class="layui-btn layui-btn-lg layui-bg-orange layui-btn-radius" th:text="'累计确诊人数：'+${chinaData.confirm}"></button>
+                    <button class="layui-btn layui-btn-lg layui-bg-green layui-btn-radius" th:text="'累计治愈人数：'+${chinaData.heal}"></button>
+                    <button class="layui-btn layui-btn-lg layui-bg-black layui-btn-radius" th:text="'累计死亡人数：'+${chinaData.dead}"></button>
+                </div>
+
+                <!-- 内容主体区域 -->
+                <div style="padding: 15px;">
+                    <div id="main" style="width: 1150px;height:580px;padding-bottom: 30px"></div>
+                </div>
+            </div>
+
+
+            <div th:include="common :: common-footer"></div>
+        </div>
+
+    </body>
+    <script th:src="@{/echarts/echarts.min.js}"></script>
+    <script th:src="@{/echarts/china.js}"></script>
+    <script th:src="@{/echarts/jquery-1.11.1.min.js}"></script>
+    <div th:include="common :: common-script"></div>
+
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        const myChart = echarts.init(document.getElementById('main'));
+        // 用来存储图表中的数据
+        const dataList = [];
+
+        option = {
+            title: {
+                text: '中国现有确诊新冠病毒疫情地图',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'item'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                data: ['中国疫情图']
+            },
+            visualMap: {
+                type: 'piecewise',
+                pieces: [
+                    {min: 1000, max: 1000000000, label: '大于等于1000人', color: '#372a28'},
+                    {min: 500, max: 999, label: '确诊500-999人', color: '#4e160f'},
+                    {min: 100, max: 499, label: '确诊100-499人', color: '#974236'},
+                    {min: 10, max: 99, label: '确诊10-99人', color: '#ee7263'},
+                    {min: 1, max: 9, label: '确诊1-9人', color: '#f5bba7'},
+                ],
+                color: ['#E0022B', '#E09107', '#A3E00B']
+            },
+            toolbox: {
+                show: true,
+                orient: 'vertical',
+                left: 'right',
+                top: 'center',
+                feature: {
+                    mark: {show: true},
+                    dataView: {show: true, readOnly: false},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            roamController: {
+                show: true,
+                left: 'right',
+                mapTypeControl: {
+                    'china': true
+                }
+            }
+        };
+
+        $.ajax({
+            url: "/query/all",
+            dataType: "json",
+            success: function (response) {
+                // 循环添加进dataList数组
+                for (let i in response) {
+                    let area = response[i].area;
+                    let nowConfirm = response[i].nowConfirm;
+                    dataList[i] = {name: area, value: nowConfirm};
+                }
+                // 将数组中的数据渲染到图表中
+                myChart.setOption({
+                    series: [
+                        {
+                            name: '现确诊病例',
+                            type: 'map',
+                            mapType: 'china',
+                            roam: false,
+                            label: {
+                                show: true,
+                                color: 'rgb(166,196,196)'
+                            },
+                            data: dataList
+                        }
+                    ]
+                })
+            }
+        });
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+    </script>
+
+</html>
+

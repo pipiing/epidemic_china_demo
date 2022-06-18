@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chen.boot.mapper.AddDataBeanMapper">
+
+    <resultMap id="BaseResultMap" type="com.chen.boot.entity.AddDataBean">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="area" column="area" jdbcType="VARCHAR"/>
+            <result property="confirmadd" column="confirmAdd" jdbcType="INTEGER"/>
+            <result property="dead" column="dead" jdbcType="INTEGER"/>
+            <result property="heal" column="heal" jdbcType="INTEGER"/>
+            <result property="zero" column="zero" jdbcType="INTEGER"/>
+            <result property="nowconfirm" column="nowConfirm" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,area,confirmAdd,
+        dead,heal,zero,
+        nowConfirm
+    </sql>
+</mapper>

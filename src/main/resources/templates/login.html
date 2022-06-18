@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="ThemeBucket">
+        <link rel="shortcut icon" href="#" type="image/png">
+
+        <title>登录</title>
+
+        <link th:href="@{/css/style.css}" rel="stylesheet">
+        <link th:href="@{/css/style-responsive.css}" rel="stylesheet">
+
+    </head>
+
+    <body class="login-body">
+
+        <div class="container">
+
+            <form class="form-signin" th:action="@{/security/do/login}" method="post">
+                <div class="form-signin-heading text-center">
+                    <h1 class="sign-title">Sign In</h1>
+                    <img th:src="@{/images/login-logo.png}" alt=""/>
+                </div>
+                <div class="login-wrap">
+                    <label style="color: red" th:if="${param.error}"
+                           th:text="${session.SPRING_SECURITY_LAST_EXCEPTION.message}"></label>
+                    <input type="text" name="username" class="form-control" placeholder="请输入登录账号" autofocus>
+                    <input type="password" name="password" class="form-control" placeholder="请输入登录密码">
+                    <button class="btn btn-lg btn-login btn-block" type="submit">
+                        <i class="fa fa-check"></i>
+                    </button>
+
+                    <div class="registration">
+                        还没有注册账号？
+                        <a class="" th:href="@{/to/register}">
+                            Sign Up
+                        </a>
+                    </div>
+                    <label class="checkbox">
+                        <input type="checkbox" name="remember-me">记住我
+                        <span class="pull-right">
+                    <a data-toggle="modal" href="#RestPwdModal">忘记密码?</a>
+
+                </span>
+                    </label>
+
+                </div>
+
+                <!-- 重置密码模态窗 -->
+                <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="RestPwdModal"
+                     class="modal fade">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;
+                                </button>
+                                <h4 class="modal-title">忘记密码？</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p>在下面输入您的登录账号和手机号码以重置密码</p>
+                                <input type="text" name="userName" placeholder="请输入登录账号" autocomplete="off"
+                                       class="form-control placeholder-no-fix">
+                                <input type="text" name="phone" placeholder="请输入手机号码" autocomplete="off"
+                                       class="form-control placeholder-no-fix">
+                                <input type="password" name="password" placeholder="请输入重置的新密码" autocomplete="off"
+                                       class="form-control placeholder-no-fix">
+                            </div>
+                            <div class="modal-footer">
+                                <button id="cancelBtn" class="btn btn-default" data-dismiss="modal" type="button">取消</button>
+                                <button id="doRestPwdBtn" class="btn btn-primary" type="button">提交</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+
+    </body>
+    <div th:include="common :: common-script"></div>
+
+    <script type="text/javascript">
+        // 1、给ID为 doRestPwdBtn 的按钮绑定单击响应事件
+        $("#doRestPwdBtn").click(function () {
+            var userName = $.trim($("#RestPwdModal [name = userName]").val());
+            var password = $.trim($("#RestPwdModal [name = password]").val());
+            var phone = $.trim($("#RestPwdModal [name = phone]").val());
+
+            $.ajax({
+                type: "post",
+                url: "/do/resetPwd",
+                dataType: "json",
+                data: {
+                    userName: userName,
+                    password: password,
+                    phone: phone
+                },
+                success: function (response) {
+                    const result = response.code;
+                    if (result === 200) {
+                        layer.msg("重置密码成功～～");
+                        // 关闭模态窗
+                        $("#RestPwdModal").modal("hide");
+                        // 清空模态窗中的数据
+                        $("#RestPwdModal [name=userName]").val("");
+                        $("#RestPwdModal [name=password]").val("");
+                        $("#RestPwdModal [name=phone]").val("");
+                    }
+                    if (result === 400) {
+                        layer.msg(response.msg);
+                    }
+                },
+                error: function (response) {
+                    layer.msg("失败！响应状态码：" + response.status + " 说明信息：" + response.statusText);
+                }
+            })
+        })
+
+        // 2、给ID为 cancelBtn 的按钮绑定单击响应事件
+        $("#cancelBtn").click(function () {
+            // 清空模态窗中的数据
+            $("#RestPwdModal [name=userName]").val("");
+            $("#RestPwdModal [name=password]").val("");
+            $("#RestPwdModal [name=phone]").val("");
+        })
+
+    </script>
+</html>

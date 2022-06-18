@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chen.boot.mapper.HealthClockMapper">
+
+    <resultMap id="BaseResultMap" type="com.chen.boot.entity.HealthClock">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+            <result property="gender" column="gender" jdbcType="VARCHAR"/>
+            <result property="age" column="age" jdbcType="INTEGER"/>
+            <result property="phone" column="phone" jdbcType="VARCHAR"/>
+            <result property="morningTemp" column="morning_temp" jdbcType="VARCHAR"/>
+            <result property="afternoonTemp" column="afternoon_temp" jdbcType="VARCHAR"/>
+            <result property="nightTemp" column="night_temp" jdbcType="VARCHAR"/>
+            <result property="feverAndCough" column="fever_and_cough" jdbcType="VARCHAR"/>
+            <result property="recentHome" column="recent_home" jdbcType="VARCHAR"/>
+            <result property="riskZone" column="risk_zone" jdbcType="VARCHAR"/>
+            <result property="recentZone" column="recent_zone" jdbcType="VARCHAR"/>
+            <result property="healthStatus" column="health_status" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,user_name,gender,
+        age,phone,morning_temp,
+        afternoon_temp,night_temp,fever_and_cough,
+        recent_home,risk_zone,recent_zone,
+        health_status,create_time
+    </sql>
+</mapper>

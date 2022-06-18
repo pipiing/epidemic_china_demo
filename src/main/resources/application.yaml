@@ -1,0 +1,63 @@
+spring:
+  # 配置数据库连接
+  datasource:
+    # 配置数据源类型
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/test?serverTimezone=Asia/Shanghai&useSSL=false&characterEncoding=utf-8
+    username: root
+    password: 202428
+  # thymeleaf模板配置
+  thymeleaf:
+    cache: false                   #  这个开发配置为false，避免改了模板还要重启服务器
+    prefix: classpath:/templates/  # 模板文件视图前缀，默认是classpath:/templates/，可不用配置
+    suffix: .html                  # 模板文件视图后缀，默认是.html，可不用配置
+    check-template-location: true  # 检查模板位置，可不用配置
+    encoding: utf-8                # 编码字符集，默认为utf-8，可不用配置
+    mode: HTML                     # 模板的模式，默认为HTML，可不用配置
+    servlet:
+      content-type: text/html       # 模板的内容类型，默认为text/html，可不用配置
+  servlet:
+    multipart:
+      max-file-size: 10MB # 单个文件的最大大小
+      max-request-size: 100MB # 整个上传的总文件大小
+  # Redis配置
+  redis:
+    host: 127.0.0.1 # 服务器地址
+    port: 6379 # 服务器连接端口
+    password: 202428 # 授权密码
+    database: 0 # 数据库索引
+    timeout: 18000000 # 连接超时时间（毫秒）
+    lettuce:
+      pool:
+        max-wait: -1 # 最大堵塞等待时间（负数表示没有限制）
+        max-active: 20 # 连接池最大连接数（负数表示没有限制）
+        max-idle: 5 # 连接池中的最大空闲连接
+        min-idle: 0 # 连接池中的最小空闲连接
+
+
+# 配置MyBatis日志
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  error: # 自定义异常处理页面显示（异常对象、异常信息）
+    include-message: always
+    include-stacktrace: always
+    include-exception: true
+
+# 阿里云 OSS 不同的服务器，地址不同
+aliyun:
+  oss:
+    file:
+      endpoint: oss-cn-hangzhou.aliyuncs.com
+      keyid: LTAI5tGMLtqB6s5UqMRNoMFn
+      keysecret: Y30lIy32vATVCjqh1UwQc8eVLTH6it
+      # bucket可以在控制台创建，也可以使用Java代码创建
+      bucketname: epidemic-file

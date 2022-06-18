@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <body>
+        <!--layui公共模块-->
+        <div th:fragment="menuRight">
+
+            <!--查询条件-->
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>搜索条件</legend>
+            </fieldset>
+            <form action="" method="post" id="searchFrm" lay-filter="searchFrm" class="layui-form">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">菜单名称</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="title" class="layui-input input-radius"
+                                   placeholder="请输入菜单名称">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="text-align: center;padding-right: 15%;">
+                        <button type="button" class="layui-btn layui-btn-sm layui-btn-radius" lay-submit=""
+                                lay-filter="doSearch"><i
+                                class="layui-icon layui-icon-search layui-icon-normal"></i>查询
+                        </button>
+                        <button type="reset" class="layui-btn layui-btn-sm layui-btn-radius layui-btn-warm"><i
+                                class="layui-icon layui-icon-refresh"></i><span>重置</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!--数据表格-->
+            <div style="padding-bottom: 40px;">
+                <table class="layui-hide" id="menuTable" lay-filter="menuTable"></table>
+                <div id="menuToolBar" style="display: none">
+                    <button type="button" lay-event="add"
+                            class="layui-btn layui-btn-sm layui-btn-normal layui-btn-radius">
+                        <i class="layui-icon layui-icon-add-1"></i>添加菜单
+                    </button>
+                </div>
+                <div id="menuRowBar" style="display: none;">
+                    <button type="button" lay-event="update" class="layui-btn layui-btn-xs layui-btn-radius"><i
+                            class="layui-icon layui-icon-edit"></i>编辑
+                    </button>
+                    <button type="button" lay-event="delete"
+                            class="layui-btn layui-btn-xs layui-btn-danger layui-btn-radius"><i
+                            class="layui-icon layui-icon-delete"></i>删除
+                    </button>
+                </div>
+            </div>
+
+            <script type="text/javascript" th:src="@{/layui_ext/dtree/dtree.js}"></script>
+            <script type="text/javascript">
+
+                //提升数据表格的作用域，因为底下还有一个reloadTable方法
+                var tableIns;
+
+                layui.use(['jquery', 'form', 'layer', 'laydate', 'table', 'layedit', 'dtree'], function () {
+                    var $ = layui.jquery;
+                    var form = layui.form;
+                    var layer = layui.layer;
+                    var table = layui.table;
+                    var dtree = layui.dtree;
+
+                    //初始化表格 加载数据
+                    tableIns = table.render({
+                        elem: "#menuTable",
+                        title: "菜单数据表格",
+                        url: "/menu/load/right",
+                        toolbar: "#menuToolBar",
+                        page: true,
+                        totalRow: true,
+                        height: 500,
+                        cols: [ [
+                            {type: 'numbers', title: 'ID', align: 'center', width: '80', fixed: 'left'},
+                            {field: 'pid', title: '父级菜单ID', align: 'center', width: '100'},
+                            {field: 'title', title: '菜单名称', align: 'center', width: '170'},
+                            {field: 'url', title: '菜单地址', align: 'center', width: '170'},
+                            {
+                                field: 'icon', title: '菜单图标', align: 'center', width: '120', templet: function (data) {
+                                    return '<i class="layui-icon">' + data.icon + '</i>';
+                                }
+                            },
+                            {
+                                field: 'available',
+                                title: '是否可用',
+                                align: 'center',
+                                width: '120',
+                                templet: function (data) {
+                                    if (data.available === 1) {
+                                        return '<span class="layui-badge layui-bg-green">可用</span>';
+                                    } else {
+                                        return '<span class="layui-badge layui-bg-red">不可用</span>';
+                                    }
+                                }
+                            },
+                            {
+                                field: 'open', title: '是否展开', align: 'center', width: '120', templet: function (data) {
+                                    if (data.open === 1) {
+                                        return '<span class="layui-badge layui-bg-blue">展开</span>';
+                                    } else {
+                                        return '<span class="layui-badge layui-bg-orange">不展开</span>';
+                                    }
+                                }
+                            },
+                            {field: 'orderNum', title: '排序码', align: 'center', width: '80'},
+                            {field: 'target', title: 'TARGET', align: 'center', width: '80', hide: true},
+                            {fixed: 'right', title: '操作', toolbar: '#menuRowBar', align: 'center', width: '180'}
+                        ] ],
+                        done: function (data, curr, count) {
+                            // 不是第一页时，如果当前返回的数据为0那么就返回上一页
+                            if (data.data.length === 0 && curr !== 1) {
+                                tableIns.reload({
+                                    page: {
+                                        curr: curr - 1
+                                    }
+                                })
+                            }
+                        }
+                    });
+
+                    // 监控模糊查询按钮事件
+                    form.on("submit(doSearch)", function (data) {
+                        tableIns.reload({
+                            where: data.field,
+                            page: {
+                                curr: 1
+                            }
+                        });
+                        return false;
+                    });
+
+                    // 监控工具条事件
+                    table.on("toolbar(menuTable)", function (obj) {
+                        switch (obj.event) {
+                            case 'add':
+                                openAddLayer();
+                                break;
+                        }
+                    });
+
+                    // 监控行工具条事件
+                    table.on("tool(menuTable)", function (obj) {
+                        //获取当前行数据
+                        var data = obj.data;
+                        switch (obj.event) {
+                            case 'delete':
+                                deleteMenu(data);
+                                break;
+                            case 'update':
+                                updateMenu(data);
+                                break;
+                        }
+                    });
+
+                    var mainIndex;
+                    var url;
+
+                    // 打开添加弹出层
+                    function openAddLayer() {
+                        mainIndex = layer.open({
+                            type: 1,
+                            content: $("#addOrUpdateDiv"),
+                            area: ['800px', '450px'],
+                            title: '添加菜单',
+                            success: function () {
+                                $("#dataFrm")[0].reset();
+                                //设置下拉树中父节点的值为空
+                                $("#pid").val("");
+                                //初始化排序码
+                                $.get("/menu/load/max/orderNum", function (response) {
+                                    $("#orderNum").val(response.value);
+                                });
+                                url = "/menu/add"
+                                //设置下拉树的value值为空
+                                selectTree.selectVal("");
+                            }
+                        });
+                    }
+
+                    // 打开修改的弹出层
+                    function updateMenu(data) {
+                        mainIndex = layer.open({
+                            type: 1,
+                            content: $("#addOrUpdateDiv"),
+                            area: ['800px', '450px'],
+                            title: '修改菜单',
+                            success: function () {
+                                //清空原有的数据
+                                $("#dataFrm")[0].reset();
+                                //装载新的数据
+                                form.val("dataFrm", data);
+                                // 选中之前的父级菜单  nodeId=data.pid
+                                dtree.dataInit("menuTree", data.pid);
+                                dtree.selectVal("menuTree");
+                                url = "/menu/update";
+                            }
+                        });
+                    }
+
+                    // 执行 新增或更新 菜单操作
+                    form.on("submit(doSubmit)", function (data) {
+                        $.ajax({
+                            url: url,
+                            type: "post",
+                            dataType: "json",
+                            data: data.field,
+                            success: function (response) {
+                                const result = response.code;
+                                if (result === 200) {
+                                    // 重载表格
+                                    tableIns.reload();
+                                    // 重新加载添加弹出层的下拉树
+                                    selectTree.reload();
+                                    // 重新加载左边的菜单树
+                                    menuTree.reload();
+                                }
+                                layer.msg(response.msg);
+                            },
+                            error: function (response) {
+                                layer.msg(response.responseJSON.msg);
+                            }
+                        });
+                        // 关闭新增模态窗
+                        layer.close(mainIndex);
+                        // 取消submit提交跳转行为
+                        return false;
+                    });
+
+                    // 删除
+                    function deleteMenu(data) {
+                        $.post("/menu/check/has/childrenNode", {id: data.id}, function (response) {
+                            if (response.value) {
+                                layer.msg("当前菜单节点有子菜单，请选择删除子菜单！")
+                            } else {
+                                layer.confirm('你确定要删除【' + data.title + '】这个菜单吗？', {
+                                    icon: 3,
+                                    title: '提示'
+                                }, function (index) {
+                                    $.ajax({
+                                        url: "/menu/delete",
+                                        type: "post",
+                                        dataType: "json",
+                                        data: {id: data.id},
+                                        success: function (response) {
+                                            const result = response.code;
+                                            if (result === 200) {
+                                                layer.msg("删除菜单信息成功～～");
+                                                tableIns.reload({
+                                                    where: "",
+                                                });
+                                                // 刷新下拉树
+                                                selectTree.reload();
+                                                // 重新加载左边的菜单树
+                                                menuTree.reload();
+                                            }
+                                            if (result === 400) {
+                                                layer.msg(response.msg);
+                                            }
+                                        },
+                                        error: function (response) {
+                                            layer.msg(response.responseJSON.msg);
+                                        }
+                                    })
+                                    // 关闭删除提示窗
+                                    layer.close(index);
+                                });
+                            }
+                        });
+                    }
+
+                    // 初始化下拉树
+                    var selectTree = dtree.renderSelect({
+                        elem: "#menuTree",
+                        width: "100%", // 可以在这里指定树的宽度来填满div
+                        dataStyle: "layuiStyle", // 使用layui风格的数据格式
+                        dataFormat: "list",     // 配置data的风格为list
+                        response: {message: "msg", statusCode: 0},  // 修改response中返回数据的定义
+                        url: "/menu/load/left/tree/json" // 使用url加载（可与data加载同时存在）
+                    });
+
+                    //监听点击的方法
+                    dtree.on("node(menuTree)", function (obj) {
+                        $("#pid").val(obj.param.nodeId);
+                    })
+
+
+                });
+
+                // 给其它页面刷新当前页面数据表格的方法
+                function reloadTable(id) {
+                    tableIns.reload({
+                        where: {
+                            id: id
+                        },
+                        page: {
+                            curr: 1
+                        }
+                    });
+                }
+
+            </script>
+        </div>
+    </body>
+</html>

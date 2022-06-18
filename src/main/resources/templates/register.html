@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="ThemeBucket">
+        <link rel="shortcut icon" href="#" type="image/png">
+
+        <title>注册</title>
+
+        <link th:href="@{/css/style.css}" rel="stylesheet">
+        <link th:href="@{/css/style-responsive.css}" rel="stylesheet">
+
+    </head>
+
+    <body class="register-body">
+
+        <div class="container">
+
+            <form action="" class="form-signin" id="register-form">
+                <div class="form-signin-heading text-center">
+                    <h1 class="sign-title">注册</h1>
+                    <img th:src="@{/images/login-logo.png}" alt=""/>
+                </div>
+                <div class="login-wrap">
+                    <label style="color: red" th:text="${exception}"></label>
+                    <input type="text" name="userName" class="form-control" placeholder="请输入登录账号"
+                           autofocus>
+
+                    <input type="password" name="password" class="form-control" placeholder="请输入登录密码">
+
+                    <input type="password" name="checkPassword" class="form-control"
+                           placeholder="请再输入登录密码">
+
+                    <input type="text" name="nickName" class="form-control" placeholder="请输入昵称" autofocus>
+
+                    <input type="text" name="phone" class="form-control" placeholder="请输入电话号码" autofocus>
+
+
+                    <button class="btn btn-lg btn-login btn-block" type="button" id="doRegister">
+                        <i class="fa fa-check"></i>
+                    </button>
+
+                    <div class="registration">
+                        已有账号，直接登录！
+                        <a class="" th:href="@{/to/login}">
+                            Sign In
+                        </a>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </body>
+    <div th:include="common :: common-script"></div>
+
+    <script type="text/javascript">
+        // 1、给ID为 doRegister 的按钮设置响应函数
+        $("#doRegister").click(function () {
+            var userName = $.trim($("#register-form [name = userName]").val());
+            var password = $.trim($("#register-form [name = password]").val());
+            var checkPassword = $.trim($("#register-form [name = checkPassword]").val());
+            var nickName = $.trim($("#register-form [name = nickName]").val());
+            var phone = $.trim($("#register-form [name = phone]").val());
+
+            $.ajax({
+                type: "post",
+                url: "/do/register",
+                dataType: "json",
+                data: {
+                    userName: userName,
+                    password: password,
+                    checkPassword: checkPassword,
+                    nickName: nickName,
+                    phone: phone
+                },
+                success: function (response) {
+                    const result = response.code;
+                    if (result === 200) {
+                        layer.msg("注册成功～～");
+                        // 重定向到登录页面
+                        setTimeout(window.location.href = "/to/login", 1000);
+                    }
+                    if (result === 400) {
+                        layer.msg(response.msg);
+                    }
+                },
+                error: function (response) {
+                    layer.msg("失败！响应状态码：" + response.status + " 说明信息：" + response.statusText);
+                }
+            })
+        })
+
+
+    </script>
+
+</html>

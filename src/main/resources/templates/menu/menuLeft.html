@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+
+<div th:fragment="menuLeft">
+<script type="text/javascript" th:src="@{/layui_ext/dtree/dtree.js}"></script>
+<!--存放树的容器-->
+<ul id="leftMenuTree" class="dtree" data-id="0"></ul>
+<script type="text/javascript">
+    var menuTree;
+    layui.use(['dtree','layer','jquery'], function(){
+        var dtree = layui.dtree;
+        var layer = layui.layer;
+        var $ = layui.jquery;
+
+        // 初始化树
+        menuTree = dtree.render({
+            elem: "#leftMenuTree",
+            dataStyle: "layuiStyle", // 使用layui风格的数据格式
+            dataFormat: "list",     // 配置data的风格为list
+            response:{message:"msg",statusCode:0},  // 修改response中返回数据的定义
+            url: "/menu/load/left/tree/json" // 使用url加载（可与data加载同时存在）
+        });
+
+        // 绑定节点点击
+        dtree.on("node('menuTree')" ,function(obj){
+            // layer.msg(JSON.stringify(obj.param));
+            // 将树节点的id传到reloadTable方法中
+            window.parent.right.reloadTable(obj.param.nodeId);
+        });
+    });
+
+</script>
+
+</div>
+</body>
+</html>

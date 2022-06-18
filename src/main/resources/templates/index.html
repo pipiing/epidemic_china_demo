@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>首页</title>
+        <div th:include="common :: common-link"></div>
+    </head>
+    <body>
+        <div class="layui-layout layui-layout-admin">
+
+            <div th:include="common :: common-head"></div>
+
+            <div th:include="common :: common-nav"></div>
+
+
+            <div class="layui-body">
+                <!-- 内容主体区域 -->
+                123
+            </div>
+
+
+            <div th:include="common :: common-footer"></div>
+        </div>
+
+    </body>
+    <div th:include="common :: common-script"></div>
+
+</html>
+

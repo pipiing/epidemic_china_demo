@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>全球新增确诊新冠病毒疫情地图</title>
+        <div th:include="common :: common-link"></div>
+    </head>
+    <body>
+        <div class="layui-layout layui-layout-admin">
+
+            <div th:include="common :: common-head"></div>
+
+            <div th:include="common :: common-nav"></div>
+
+
+            <div class="layui-body">
+                <!-- 内容主体区域 -->
+                <div style="padding: 15px;">
+                    <div id="main" style="width: 1150px;height:580px;"></div>
+                </div>
+            </div>
+
+
+            <div th:include="common :: common-footer"></div>
+        </div>
+
+    </body>
+    <script th:src="@{/echarts/echarts.min.js}"></script>
+    <script th:src="@{/echarts/world.js}"></script>
+    <script th:src="@{/echarts/jquery-1.11.1.min.js}"></script>
+    <div th:include="common :: common-script"></div>
+
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        const myChart = echarts.init(document.getElementById('main'));
+        // 用来存储图表中的数据
+        const dataList = [];
+
+        option = {
+            title: {
+                text: '全球新增确诊新冠病毒疫情地图',
+                left: 'center',
+                top: 'top'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: function(params) {
+                    var value = params.value + '';
+                    return params.seriesName + '<br/>' + params.name + ' : ' + value+'人';
+                }
+            },
+            toolbox: {
+                show: true,
+                orient: 'vertical',
+                left: 'right',
+                top: 'center',
+                feature: {
+                    dataView: {
+                        readOnly: false
+                    },
+                    restore: {},
+                    saveAsImage: {}
+                }
+            },
+            visualMap: {
+                min: 0,
+                max: 100000,
+                text: ['High', 'Low'],
+                realtime: false,
+                calculable: true,
+                color: ['orangered', 'yellow', 'lightskyblue']
+            }
+        };
+
+        $.ajax({
+            url: "/query/global/add/all",
+            dataType: "json",
+            success: function (response) {
+                // 循环添加进dataList数组
+                for (let i in response) {
+                    let country_name = response[i].name;
+                    let confirmAdd = response[i].confirmAdd;
+                    dataList[i] = {name: country_name, value: confirmAdd};
+                }
+                // 将数组中的数据渲染到图表中
+                myChart.setOption({
+                    series: [{
+                        name: '新增确诊病例',
+                        type: 'map',
+                        mapType: 'world',
+                        roam: true,
+                        itemStyle: {
+                            emphasis: {
+                                label: {
+                                    show: true
+                                }
+                            }
+                        },
+                        data: dataList
+                    }]
+                })
+            }
+        });
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+    </script>
+
+</html>
+
