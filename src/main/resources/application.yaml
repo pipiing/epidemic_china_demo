@@ -56,8 +56,8 @@ server:
 aliyun:
   oss:
     file:
-      endpoint: oss-cn-hangzhou.aliyuncs.com
-      keyid: LTAI5tGMLtqB6s5UqMRNoMFn
-      keysecret: Y30lIy32vATVCjqh1UwQc8eVLTH6it
+      endpoint: # 使用自己的阿里云Oss
+      keyid: 
+      keysecret: 
       # bucket可以在控制台创建，也可以使用Java代码创建
-      bucketname: epidemic-file
+      bucketname: 
